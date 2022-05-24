@@ -1,0 +1,24 @@
+doctype
+html(lang="ru")
+    head
+        meta( charset="UTF-8" )
+        meta( name="viewport" content="width=device-width, initial-scale=1, user-scalable=0")
+        title Title
+        include meta
+        include ../components/additional/add-import
+
+
+    body.body
+    
+        
+        include ../components/sections/header
+        //- Content
+        //- include ../components/sections/block-form
+        //- Content end
+
+        include ../components/sections/footer
+
+        script(src='/build/js/jquery.js')
+        script(src='/build/js/index.js')
+        script(src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js")
+        script(src='/build/js/svg.min.js' defer)

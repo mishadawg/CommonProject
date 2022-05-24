@@ -1,0 +1,61 @@
+html,body
+  min-height: 100vh
+  -webkit-text-size-adjust: none
+
+.body
+  font-family: 'Montserrat', sans-serif !important
+  font-style: normal
+  display: flex
+  flex-direction: column
+  position: relative
+.content
+  flex: 1 0 auto
+.footer
+  flex: 0 0 auto
+.container
+  max-width: 100%
+  width: 1142px
+  margin: 0 auto
+
+// AOS
+/* IE11 */
+@media all and (-ms-high-contrast:none)
+  *::-ms-backdrop,[data-aos^=fade][data-aos^=fade],[data-aos^=zoom][data-aos^=zoom]
+    opacity: 1
+
+// Etc 
+button
+  cursor: pointer
+a
+  text-decoration: none
+ul
+  list-style: none
+
+svg
+  &.mail
+    width: 18px
+    height: 18px
+  &.social
+    width: 30px
+    height: 30px
+  &.arrow
+    width: 35px
+    height: 18px
+    &-prev,&-next
+      width: 7px
+      height: 24px
+    &-small
+      width: 12px
+      height: 6px
+
+// Media
+@media screen and (max-width: 1380px)
+  .container
+    width: 100%
+@media screen and (max-width: 1200px)
+  .container
+    width: 100%
+    padding: 0 30px
+@media screen and (max-width: 576px)
+  .container
+    padding: 0 15px
