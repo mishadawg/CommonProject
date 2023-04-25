@@ -1,0 +1,65 @@
+.header
+  display: flex
+  justify-content: center
+  position: fixed
+  top: 0px
+  left: 0px
+  z-index: 15
+  width: 100%
+  a
+    text-decoration: none
+  .container
+    display: flex
+    align-items: center
+    justify-content: space-between
+  &-container
+    max-width: 1728px
+    width: 100%
+    background: $secondaryColorGradient
+    border-radius: 12px
+    margin: 20px 0px
+    padding: 8px 26px
+    transition: .3s
+    &.fullWidth
+      max-width: initial
+      margin: 0px
+      border-radius: 0px
+  &-menu
+    &__container
+      ul
+        list-style: none
+      a,p
+        color: $primaryColor
+    &__list
+      display: flex
+      align-items: center
+      gap: 0px 40px
+        
+    &__subList
+      display: none
+  &-system
+    &__block
+      display: flex
+      align-items: center
+      gap: 0px 32px
+      a
+        color: $primaryColor
+      svg
+        width: 16px
+        height: 16px
+    &__avatar
+      display: block
+      padding: 12px
+      border-radius: 50%
+      background-color: $primaryColor
+      color: #EFFAFF !important
+    &__lang
+      display: flex
+      align-items: center
+      a
+        color: $primaryColor
+      svg
+        margin-right: 8px
+
+      
+  

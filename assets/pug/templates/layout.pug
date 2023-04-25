@@ -1,24 +1,25 @@
+block variables
 doctype
 html(lang="ru")
-    head
-        meta( charset="UTF-8" )
-        meta( name="viewport" content="width=device-width, initial-scale=1, user-scalable=0")
-        title Title
-        include meta
-        include ../components/additional/add-import
+  head
+    meta( charset="UTF-8" )
+    meta( name="viewport" content="width=device-width, initial-scale=1, user-scalable=0")
+    title Common project set 2.0
+    include meta
+    include ../components/additional/add-import
+    if (cssName !== undefined)
+      link(rel=`stylesheet` href=`./../build/css/${cssName}.css`)
 
+  body.body
+    .page__header
+      include ../components/sections/header
+    .page__content
+      if breadcrumbs
+        .container
+          +breadcrumb(breadcrumbs)
+          if title
+            p.title-first=title 
+      block content
+    .page__footer
+      include ../components/sections/footer 
 
-    body.body
-    
-        
-        include ../components/sections/header
-        //- Content
-        //- include ../components/sections/block-form
-        //- Content end
-
-        include ../components/sections/footer
-
-        script(src='/build/js/jquery.js')
-        script(src='/build/js/index.js')
-        script(src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js")
-        script(src='/build/js/svg.min.js' defer)

@@ -1,0 +1,9 @@
+mixin breadcrumb (data=[])
+  nav(aria-label="breadcrumb").breadcrumb
+    ul.breadcrumb-list
+      each item in data
+        if item.active
+          li(aria-current="page").breadcrumb-item.active=item.title
+        else
+          li.breadcrumb-item
+            a(href=item.href).breadcrumb-link=item.title

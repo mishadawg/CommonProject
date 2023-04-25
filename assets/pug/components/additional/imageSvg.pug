@@ -1,0 +1,3 @@
+mixin imageSvg({name, selector}={name: '', selector: ''})
+  svg(role="img" class=selector)
+    use(xlink:href='../build/img/icons/icons.svg#' + name)

@@ -1,1 +1,1 @@
-//=include jquery/dist/jquery.js
+//=include jquery/dist/jquery.min.js

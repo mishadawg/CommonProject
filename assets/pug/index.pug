@@ -1,1 +1,19 @@
-extends templates/layout
+extends ./templates/layout
+
+block variables
+  - var cssName = "indexPage"
+  -
+    var breadcrumbs = [
+      {title: "Главная", href: 'index.html', active: false},
+      {title: "Test breadcrumbs", href: '', active: true},
+    ]
+  - var mailIcon = {name: 'mail', selector:'icon'}
+
+block content 
+  div.container
+    div.indexPageContainer
+      h2 test index title page
+      img(src="../build/img/stock/stockImg4.jpg", alt="Alt text")
+      +imageSvg(mailIcon)
+
+  script(src="../build/js/pages/mainPage.js")

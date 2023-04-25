@@ -1,7 +1,8 @@
 const gulp = require('gulp'),
-    sass = require('gulp-sass'),
+    sass = require('gulp-sass')(require('sass')),
     browserSync = require('browser-sync'),
-    cleancss = require('gulp-clean-css'),
+    // cleancss = require('gulp-clean-css'),
+    clean = require('gulp-clean'),
     svgSprite = require('gulp-svg-sprite'),
     autoprefixer = require('gulp-autoprefixer'),
     pug = require('gulp-pug'),
@@ -21,13 +22,14 @@ const gulp = require('gulp'),
 
 //paths
 let local = './';
+let html = 'html/'
 let buildFolder = local + 'build/';
 let sourceFolder = local + 'assets/';
 
 let project = {
     build: {
         root: buildFolder,
-        html: local,
+        html: html,
         css: buildFolder + 'css/',
         fonts: buildFolder + 'fonts/',
         js: buildFolder + 'js/',
@@ -56,7 +58,7 @@ let project = {
             sourceFolder + 'pug/*.pug'
         ],
         icons: sourceFolder + 'img/icons/**/*.svg',
-        sass: sourceFolder + 'sass/*.sass',
+        sass: [sourceFolder + 'sass/*.sass', sourceFolder + 'sass/pages/*.sass'],
         css: sourceFolder + 'css/*.css',
         sassSrc: [
             sourceFolder + 'sass/*.sass',
@@ -73,6 +75,7 @@ let project = {
 // Local Server
 gulp.task('browser-sync', function () {
     browserSync({
+        startPath: '/html',
         server: {
             baseDir: local
         },
@@ -238,6 +241,13 @@ gulp.task('watch', function () {
 // gulp.task('clean', function () {
 //     return del([buildFolder, local + '*.html'])
 // });
+
+// очистка папки html
+gulp.task('clean-html', () => {
+    return gulp
+        .src('html/*.html', {read: false})
+        .pipe(clean());
+});
 
 gulp.task('build', gulp.series(gulp.parallel(gulp.series('fonts', 'styles'), gulp.series('jsLibs', 'js'), 'img', 'svgSprite', 'pug')));
 
