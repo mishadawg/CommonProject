@@ -7,4 +7,4 @@ npm install
 ```
 gulp
 ```
-## NPM version  v10.24.1
+## Running on node version  18.12.1
