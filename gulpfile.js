@@ -58,17 +58,17 @@ let project = {
             sourceFolder + 'pug/*.pug'
         ],
         icons: sourceFolder + 'img/icons/**/*.svg',
-        sass: [sourceFolder + 'sass/*.sass', sourceFolder + 'sass/pages/*.sass'],
+        sass: [sourceFolder + 'styles/*.sass', sourceFolder + 'styles/pages/*.sass'],
         css: sourceFolder + 'css/*.css',
         sassSrc: [
-            sourceFolder + 'sass/*.sass',
-            sourceFolder + 'sass/*.scss',
-            sourceFolder + 'sass/**/*.scss',
-            sourceFolder + 'sass/**/*.sass',
+            sourceFolder + 'styles/*.sass',
+            sourceFolder + 'styles/*.scss',
+            sourceFolder + 'styles/**/*.scss',
+            sourceFolder + 'styles/**/*.sass',
         ],
         fonts: sourceFolder + 'fonts/**/*.*',
         jsLibs: sourceFolder + 'js/libs/*.js',
-        globalIncludefiles: './' + sourceFolder + 'sass/global/include/',
+        globalIncludefiles: './' + sourceFolder + 'styles/global/include/',
     },
 };
 
