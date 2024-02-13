@@ -3,5 +3,5 @@ package-lock.json
 node_modules
 /assets/fonts/Icons/
 /build/fonts/Icons/
-/build
+/dist/build
 *.html

@@ -22,9 +22,9 @@ const gulp = require('gulp'),
 
 //paths
 let local = './';
-let html = 'html/'
-let buildFolder = local + 'build/';
-let sourceFolder = local + 'assets/';
+let html = 'dist/build/html/'
+let buildFolder = local + 'dist/build/';
+let sourceFolder = local + 'dist/assets/';
 
 let project = {
     build: {
@@ -75,12 +75,13 @@ let project = {
 // Local Server
 gulp.task('browser-sync', function () {
     browserSync({
-        startPath: '/html',
+        startPath: html,
         server: {
             baseDir: local
         },
         notify: false,
-        open: true // set true to automatically open browser folder localhost:3000
+        open: true 
+        // set true to automatically open browser folder localhost:3000
         // online: false, // Work offline without internet connection
         // tunnel: true, tunnel: 'projectname', // Demonstration page: http://projectname.localtunnel.me
     })
@@ -153,7 +154,7 @@ gulp.task('styles', function () {
 
 // css
 gulp.task('stylesCss', function() {
-    gulp.src(['assets/css/*.css'])
+    gulp.src(['dist/assets/css/*.css'])
         .pipe(gulp.dest('build/css'))
 });
 
@@ -245,7 +246,7 @@ gulp.task('watch', function () {
 // очистка папки html
 gulp.task('clean-html', () => {
     return gulp
-        .src('html/*.html', {read: false})
+        .src('dist/html/*.html', {read: false})
         .pipe(clean());
 });
 
