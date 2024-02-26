@@ -51,7 +51,7 @@ let project = {
             '!' + sourceFolder + 'img/icons/*.*',
         ],
         pug: [
-            sourceFolder + 'pug/*.pug',
+            sourceFolder + 'pug/pages/*.pug',
         ],
         pugSrc: [
             sourceFolder + 'pug/**/*.pug',
