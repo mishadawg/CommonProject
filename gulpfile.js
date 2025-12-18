@@ -1,103 +1,127 @@
-const gulp = require('gulp'),
-    sass = require('gulp-sass')(require('sass')),
-    browserSync = require('browser-sync'),
-    // cleancss = require('gulp-clean-css'),
-    clean = require('gulp-clean'),
-    svgSprite = require('gulp-svg-sprite'),
-    autoprefixer = require('gulp-autoprefixer'),
-    pug = require('gulp-pug'),
-    sourcemaps = require('gulp-sourcemaps'),
-    gulpDebug = require('gulp-debug'),
-    fs = require('fs'),
-    path = require('path'),
-    mergeJson = require('gulp-merge-json'),
-    notify = require('gulp-notify'),       // всплывающие уведомления
-    imagemin = require('gulp-imagemin'),	 // минификация изображений
-    newer = require('gulp-newer'),        // ограничение выборки для ускорения компиляции
-    duration = require('gulp-duration'),     // время выполнения
-    include = require('gulp-include'),
-    plumber = require('gulp-plumber'),
-    babel = require('gulp-babel')
-    // del = require('del');
+import gulp from 'gulp';
+import browserSync from 'browser-sync';
+import clean from 'gulp-clean';
+import svgSprite from 'gulp-svg-sprite';
+import autoprefixer from 'gulp-autoprefixer';
+import pug from 'gulp-pug';
+import sourcemaps from 'gulp-sourcemaps';
+import gulpDebug from 'gulp-debug';
+import fs from 'fs';
+import path from 'path';
+import mergeJson from 'gulp-merge-json';
+import notify from 'gulp-notify';
+import imagemin from 'gulp-imagemin';
+import newer from 'gulp-newer';
+import duration from 'gulp-duration';
+import include from 'gulp-include';
+import plumber from 'gulp-plumber';
+import babel from 'gulp-babel';
+import { compileString } from 'sass';
+import through from 'through2';
 
-//paths
-let local = './';
-let html = 'dist/build/html/'
-let buildFolder = local + 'dist/build/';
-let sourceFolder = local + 'dist/assets/';
+process.env.SASS_DEPRECATION_WARNINGS = '0';
 
-let project = {
-    build: {
-        root: buildFolder,
-        html: html,
-        css: buildFolder + 'css/',
-        fonts: buildFolder + 'fonts/',
-        js: buildFolder + 'js/',
-        img: buildFolder + 'img/',
-    },
-    src: {
-        js: [
-            sourceFolder + 'js/**/*.{js,json}',
-            '!' + sourceFolder + 'js/libs/*.js'
-        ],
-        root: sourceFolder,
-        jsonDir: sourceFolder + 'data/',
-        json: sourceFolder + 'data/**/*.json',
-        dataJson: sourceFolder + "temp/data.json",
-        temp: sourceFolder + "temp",
-        img: [
-            sourceFolder + 'img/**/*.*',
-            '!' + sourceFolder + 'img/sprite/*.*',
-            '!' + sourceFolder + 'img/icons/*.*',
-        ],
-        pug: [
-            sourceFolder + 'pug/pages/*.pug',
-        ],
-        pugSrc: [
-            sourceFolder + 'pug/**/*.pug',
-            sourceFolder + 'pug/*.pug'
-        ],
-        icons: sourceFolder + 'img/icons/**/*.svg',
-        sass: [sourceFolder + 'styles/*.sass', sourceFolder + 'styles/pages/*.sass'],
-        css: sourceFolder + 'css/*.css',
-        sassSrc: [
-            sourceFolder + 'styles/*.sass',
-            sourceFolder + 'styles/*.scss',
-            sourceFolder + 'styles/**/*.scss',
-            sourceFolder + 'styles/**/*.sass',
-        ],
-        fonts: sourceFolder + 'fonts/**/*.*',
-        jsLibs: sourceFolder + 'js/libs/*.js',
-        globalIncludefiles: './' + sourceFolder + 'styles/global/include/',
-    },
+// Конфигурация путей
+const config = {
+    local: './',
+    buildFolder: 'dist/build/',
+    sourceFolder: 'dist/assets/',
+    
+    get paths() {
+        const build = this.buildFolder;
+        const src = this.sourceFolder;
+        
+        return {
+            build: {
+                root: build,
+                html: build + 'html/',
+                css: build + 'css/',
+                fonts: build + 'fonts/',
+                js: build + 'js/',
+                img: build + 'img/',
+                downloads: build + 'downloads/',
+            },
+            src: {
+                root: src,
+                jsonDir: src + 'data/',
+                json: src + 'data/**/*.json',
+                dataJson: src + 'temp/data.json',
+                temp: src + 'temp',
+                img: [
+                    src + 'img/**/*.*',
+                    '!' + src + 'img/sprite/*.*',
+                    '!' + src + 'img/icons/*.*',
+                ],
+                pug: {
+                    pages: src + 'pug/pages/*.pug',
+                    all: [
+                        src + 'pug/**/*.pug',
+                        src + 'pug/*.pug'
+                    ]
+                },
+                icons: src + 'img/icons/**/*.svg',
+                sass: {
+                    main: [src + 'styles/*.sass', src + 'styles/pages/*.sass'],
+                    all: [
+                        src + 'styles/**/*.sass',
+                        src + 'styles/**/*.scss'
+                    ]
+                },
+                css: src + 'css/*.css',
+                fonts: src + 'fonts/**/*.*',
+                js: {
+                    main: [
+                        src + 'js/**/*.{js,json}',
+                        '!' + src + 'js/libs/*.js'
+                    ],
+                    libs: src + 'js/libs/*.js'
+                },
+                globalIncludefiles: './' + src + 'styles/global/include/',
+                downloads: src + 'downloads/**/*.*',
+            }
+        };
+    }
 };
 
+const project = config.paths;
+
+// Обработчик ошибок
+const errorHandler = (taskName) => 
+    plumber({
+        errorHandler: notify.onError({
+            title: `Ошибка в задаче ${taskName}`,
+            message: '<%= error.message %>'
+        })
+    });
+
 // Local Server
-gulp.task('browser-sync', function () {
+gulp.task('browser-sync', function (done) {
     browserSync({
-        startPath: html,
         server: {
-            baseDir: local
+            baseDir: './dist/build/' 
         },
+        startPath: '/html/', 
         notify: false,
-        open: true 
-        // set true to automatically open browser folder localhost:3000
-        // online: false, // Work offline without internet connection
-        // tunnel: true, tunnel: 'projectname', // Demonstration page: http://projectname.localtunnel.me
-    })
+        open: true
+    });
+    done();
 });
 
-function bsReload(done) { browserSync.reload(); done(); };
+function bsReload(done) { 
+    browserSync.reload(); 
+    done(); 
+}
 
-// pug
+// Pug data preparation
 gulp.task('pug:data', function () {
     return gulp.src(project.src.json)
+        .pipe(errorHandler('pug:data'))
         .pipe(mergeJson({
             fileName: 'data.json',
             edit: function (json, file) {
-                let filename = path.basename(file.path),
-                    primaryKey = filename.replace(path.extname(filename), ''),
-                    data = { "data": {} };
+                const filename = path.basename(file.path);
+                const primaryKey = filename.replace(path.extname(filename), '');
+                const data = { "data": {} };
 
                 data["data"][primaryKey] = json;
                 return data;
@@ -106,152 +130,262 @@ gulp.task('pug:data', function () {
         .pipe(gulp.dest(project.src.temp));
 });
 
-gulp.task('bsReload', function (done) {
-    browserSync.reload();
-    done();
+// Pug compilation
+gulp.task('pug', function () {
+    // Проверяем существование data.json
+    if (!fs.existsSync(project.src.dataJson)) {
+        console.log('Data.json не найден, сначала выполните pug:data');
+        return gulp.src(project.src.pug.pages)
+            .pipe(errorHandler('pug'))
+            .pipe(pug({
+                pretty: true,
+                data: {}
+            }))
+            .pipe(gulp.dest(project.build.html))
+            .pipe(browserSync.stream());
+    }
+
+    return gulp.src(project.src.pug.pages)
+        .pipe(errorHandler('pug'))
+        .pipe(pug({
+            pretty: true,
+            data: JSON.parse(fs.readFileSync(project.src.dataJson))
+        }))
+        .pipe(gulp.dest(project.build.html))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('pug',
-    gulp.series(
-        'pug:data',
-        function buildHTML() {
-            return gulp.src(project.src.pug)
-                .pipe(pug({
-                    pretty: true,
-                    data: JSON.parse(fs.readFileSync(project.src.dataJson))
-                }))
-                .pipe(gulp.dest(project.build.html))
-        },
-        'bsReload'
-    )
-);
-
-let options = {
+const sassOptions = {
     libs: [
         './node_modules/',
         project.src.globalIncludefiles
     ]
-}
+};
 
-// Custom Styles
+// Copy CSS libraries
+gulp.task('copy-css-libs', function () {
+    const cssSources = [
+        'dist/assets/styles/global/helpers/*.css',
+    ];
+    
+    return gulp.src(cssSources, { allowEmpty: true })
+        .pipe(errorHandler('copy-css-libs'))
+        .pipe(gulp.dest(project.build.css + 'global/helpers/'))
+        .pipe(browserSync.stream());
+});
+
+// Custom Styles - упрощенная версия
 gulp.task('styles', function () {
-    return gulp.src(project.src.sass)
+    return gulp.src(project.src.sass.main)
+        .pipe(errorHandler('styles'))
         .pipe(sourcemaps.init())
-        .pipe(sass({
-            outputStyle: 'expanded',
-            includePaths: options.libs
+        .pipe(through.obj(function (file, enc, cb) {
+            if (file.isNull()) return cb(null, file);
+            if (file.isStream()) return cb(new Error('Streaming not supported'));
+            
+            console.log('📂 Обрабатываю файл:', file.path);
+            console.log('📁 Директория файла:', path.dirname(file.path));
+            
+            try {
+                // Получаем базовый путь для стилей
+                const baseStylesPath = path.join(process.cwd(), 'dist/assets/styles');
+                console.log('📍 Базовый путь стилей:', baseStylesPath);
+                
+                const result = compileString(file.contents.toString(), {
+                    style: 'expanded',
+                    loadPaths: [
+                        baseStylesPath,  // dist/assets/styles
+                        path.join(baseStylesPath, 'global'),
+                        path.join(baseStylesPath, 'global/helpers'),
+                        path.join(baseStylesPath, 'pages'),
+                        './node_modules',
+                        process.cwd()
+                    ],
+                    quietDeps: true,
+                    silenceDeprecations: ['import'],
+                    syntax: 'indented',
+                });
+                
+                file.contents = Buffer.from(result.css);
+                file.extname = '.css';
+                console.log('✅ Успешно скомпилирован:', file.path);
+                cb(null, file);
+            } catch (error) {
+                console.error('❌ Ошибка в:', file.path);
+                console.error('💡 Сообщение:', error.message);
+                
+                // Показываем проблемную строку
+                const content = file.contents.toString();
+                const lines = content.split('\n');
+                console.error('📄 Первые 3 строки файла:');
+                lines.slice(0, 3).forEach((line, i) => {
+                    console.error(`   ${i + 1}: ${line}`);
+                });
+                
+                cb(error);
+            }
         }))
-        //.pipe(gulpDebug({title: "sass"})) //uncomment to see compiled files
-        //.pipe(cleancss()) // uncomment for styles minification
         .pipe(autoprefixer({
             grid: true,
             overrideBrowserslist: ['last 30 versions']
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(project.build.css))
-        .pipe(browserSync.stream())
+        .pipe(browserSync.stream());
 });
 
-// css
+// CSS copy
 gulp.task('stylesCss', function() {
-    gulp.src(['dist/assets/css/*.css'])
-        .pipe(gulp.dest('build/css'))
+    return gulp.src(project.src.css)
+        .pipe(errorHandler('stylesCss'))
+        .pipe(gulp.dest(project.build.css))
+        .pipe(browserSync.stream());
 });
 
-//fonts
+// Fonts copy
 gulp.task('fonts', function () {
     return gulp.src(project.src.fonts)
+        .pipe(errorHandler('fonts'))
         .pipe(newer(project.build.fonts))
-        .pipe(gulp.dest(project.build.fonts))
+        .pipe(gulp.dest(project.build.fonts));
 });
 
-//svg-sprites
-gulp.task("svgSprite", function () {
-    return gulp
-        .src([project.src.icons])
-        .pipe(
-            svgSprite({
-                mode: {
-                    stack: {
-                        sprite: "../icons/icons.svg",
-                        // example: true,
-                    },
+// SVG sprites
+gulp.task('svgSprite', function () {
+    return gulp.src(project.src.icons)
+        .pipe(errorHandler('svgSprite'))
+        .pipe(svgSprite({
+            mode: {
+                stack: {
+                    sprite: "../icons/icons.svg",
                 },
-            })
-        )
+            },
+        }))
         .pipe(gulp.dest(project.build.img));
 });
 
-//img
+// Images optimization
 gulp.task('img', function () {
     return gulp.src(project.src.img)
+        .pipe(errorHandler('img'))
         .pipe(newer(project.build.img))
-        .pipe(gulpDebug({ 'title': '- img' }))
+        .pipe(gulpDebug({ title: '- img' }))
         .pipe(imagemin({ progressive: true }))
         .pipe(duration('img time'))
-        .pipe(gulp.dest(project.build.img))
+        .pipe(gulp.dest(project.build.img));
 });
 
-//js
+// JavaScript compilation
 gulp.task('js', function () {
-    return gulp.src(project.src.js, { since: gulp.lastRun('js') })
-        .pipe(plumber(
-            notify.onError({
-                message: '<%= error.message %>',
-                title: 'Js Task Error!'
-            })))
+    return gulp.src(project.src.js.main, { since: gulp.lastRun('js') })
+        .pipe(errorHandler('js'))
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['@babel/preset-env'],
-            plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-private-methods']
+            plugins: [
+                '@babel/plugin-proposal-class-properties', 
+                '@babel/plugin-proposal-private-methods'
+            ]
         }))
-        .pipe(gulpDebug({ 'title': '- js' }))
+        .pipe(gulpDebug({ title: '- js' }))
         .pipe(duration('js time'))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(project.build.js));
 });
 
-
-//js libs
+// JavaScript libraries
 gulp.task('jsLibs', function () {
-    return gulp.src(project.src.jsLibs)
+    return gulp.src(project.src.js.libs)
+        .pipe(errorHandler('jsLibs'))
         .pipe(include({
             extensions: 'js',
             hardFail: true,
             separateInputs: true,
             includePaths: [
-                __dirname + '/node_modules'
+                process.cwd() + '/node_modules'
             ]
         }))
-        .pipe(gulp.dest(project.build.js))
+        .pipe(gulp.dest(project.build.js));
 });
 
+// Copy files for download
+gulp.task('downloads', function () {
+    return gulp.src(project.src.downloads)
+        .pipe(errorHandler('downloads'))
+        .pipe(newer(project.build.downloads))
+        .pipe(gulpDebug({ title: 'downloads' }))
+        .pipe(gulp.dest(project.build.downloads))
+        .pipe(browserSync.stream ? browserSync.stream() : gulp.dest(project.build.downloads));
+});
+
+// Watch task
 gulp.task('watch', function () {
-    gulp.watch(project.src.sassSrc, gulp.parallel('styles'));
-    gulp.watch(project.src.sassSrc, gulp.parallel('stylesCss'));
-    gulp.watch(project.src.json, gulp.parallel('pug'));
-    gulp.watch(project.src.pugSrc, gulp.parallel('pug'));
-    gulp.watch(project.src.fonts, gulp.series('fonts'))
-    gulp.watch(project.src.img, gulp.parallel('img', 'bsReload'));
-    gulp.watch(project.src.jsLibs, gulp.parallel('jsLibs', 'bsReload'));
-    gulp.watch(project.src.js, gulp.series('js', 'bsReload'))
-    gulp.watch(project.src.icons, gulp.parallel('svgSprite'));
+    gulp.watch(project.src.sass.all, gulp.parallel('styles'));
+    gulp.watch(project.src.css, gulp.parallel('stylesCss'));
+    gulp.watch(project.src.json, gulp.series('pug:data', 'pug'));
+    gulp.watch(project.src.pug.all, gulp.parallel('pug'));
+    gulp.watch(project.src.fonts, gulp.series('fonts', bsReload));
+    gulp.watch(project.src.img, gulp.series('img', bsReload));
+    gulp.watch(project.src.js.libs, gulp.series('jsLibs', bsReload));
+    gulp.watch(project.src.js.main, gulp.series('js', bsReload));
+    gulp.watch(project.src.icons, gulp.series('svgSprite', bsReload));
+    gulp.watch(project.src.downloads, gulp.series('downloads', bsReload));
 });
 
-// очистка папки с финальной сборкой
-// gulp.task('clean', function () {
-//     return del([buildFolder, local + '*.html'])
-// });
-
-// очистка папки html
-gulp.task('clean-html', () => {
-    return gulp
-        .src('dist/html/*.html', {read: false})
+// Clean tasks
+gulp.task('clean-html', function () {
+    return gulp.src(project.build.html + '*.html', { read: false, allowEmpty: true })
         .pipe(clean());
 });
 
-gulp.task('build', gulp.series(gulp.parallel(gulp.series('fonts', 'styles'), gulp.series('jsLibs', 'js'), 'img', 'svgSprite', 'pug')));
+gulp.task('clean-build', function () {
+    return gulp.src(project.build.root, { read: false, allowEmpty: true })
+        .pipe(clean());
+});
 
-gulp.task('bitrix', gulp.series(gulp.parallel(gulp.series('fonts', 'styles'), gulp.series('jsLibs', 'js'), 'img', 'svgSprite')));
+// Build tasks
+gulp.task('build', gulp.series(
+    'clean-build',
+    gulp.parallel(
+        'fonts', 
+        'styles', 
+        'stylesCss',
+        'copy-css-libs',
+        gulp.series('jsLibs', 'js'), 
+        'img', 
+        'svgSprite', 
+        'downloads',
+        gulp.series('pug:data', 'pug')
+    )
+));
 
-gulp.task('default', gulp.series(gulp.parallel(gulp.series('fonts', 'styles'), gulp.series('jsLibs', 'js'), 'browser-sync', 'img', 'svgSprite', 'stylesCss', 'pug', 'watch')));
+gulp.task('bitrix', gulp.series(
+    gulp.parallel(
+        'fonts', 
+        'styles', 
+        'stylesCss',
+        gulp.series('jsLibs', 'js'), 
+        'img', 
+        'svgSprite',
+        'downloads',
+    )
+));
+
+// Default task
+gulp.task('default', gulp.series(
+    gulp.parallel(
+        'fonts', 
+        'styles', 
+        'stylesCss',
+        'copy-css-libs',
+        gulp.series('jsLibs', 'js'), 
+        'img', 
+        'svgSprite', 
+        'downloads',
+        gulp.series('pug:data', 'pug')
+    ),
+    gulp.parallel(
+        'browser-sync',
+        'watch'
+    )
+));

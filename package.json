@@ -1,19 +1,25 @@
 {
-  "name": "Common project set 2.0",
+  "name": "Project-set-2.0",
   "version": "1.0.0",
-  "description": "",
+  "description": "Project setup with Gulp build system",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "gulp",
+    "build": "gulp build",
+    "build:bitrix": "gulp bitrix",
+    "clean": "gulp clean-build",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.20.12",
-    "@babel/preset-env": "^7.20.2",
-    "aos": "^2.3.4",
-    "browser-sync": "^2.27.11",
-    "fs": "0.0.1-security",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-private-methods": "^7.18.6",
+    "browser-sync": "^2.29.3",
+    "del": "^7.0.0",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^8.0.0",
     "gulp-babel": "^8.0.0",
@@ -21,8 +27,6 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-debug": "^4.0.0",
     "gulp-duration": "0.0.0",
-    "gulp-iconfont": "^11.0.1",
-    "gulp-iconfont-css": "^3.0.0",
     "gulp-imagemin": "^7.1.0",
     "gulp-include": "^2.4.1",
     "gulp-merge-json": "^2.1.2",
@@ -30,17 +34,9 @@
     "gulp-notify": "^4.0.0",
     "gulp-plumber": "^1.2.1",
     "gulp-pug": "^5.0.0",
-    "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-svg-sprite": "^2.0.1",
-    "path": "^0.12.7",
     "pug": "^3.0.2",
-    "sass": "^1.58.2"
-  },
-  "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "del": "^7.0.0",
-    "jquery": "^3.6.3"
+    "sass": "^1.69.5"
   }
 }
